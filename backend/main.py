@@ -46,7 +46,7 @@ except ImportError:
     _OPENAI_OK = False
 
 ROOT = Path(__file__).resolve().parent
-FRONTEND = ROOT.parent / "frontend"
+FRONTEND = ROOT.parent / "docs"   # GitHub Pages 소스(/docs)와 동일 폴더를 서버도 서빙
 # 키 탐색 경로: 환경변수 우선, 없으면 상위 폴더들의 *.txt
 KEY_SEARCH_DIRS = [ROOT, ROOT.parent, ROOT.parent.parent]
 
