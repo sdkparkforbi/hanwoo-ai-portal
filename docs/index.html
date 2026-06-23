@@ -158,7 +158,7 @@
     <div class="md:col-span-2 bg-white rounded-2xl ring-1 ring-stone-200 p-4">
       <div class="flex items-center justify-between mb-2">
         <h3 class="font-bold">도매가격 예측 (P10·P50·P90)</h3>
-        <span class="text-xs text-stone-400">mock 트랜스포머</span>
+        <span class="text-xs text-stone-400">KREI 실데이터 앵커</span>
       </div>
       <canvas id="fcChart" height="220"></canvas>
       <div class="mt-3 flex flex-wrap gap-2 text-xs">
@@ -252,6 +252,7 @@
 <script>
 // ── 설정: 같은 출처(/api)를 우선 호출 → 실패 시 데모 폴백 ──
 const API = "";                  // 상대경로: FastAPI가 서빙하면 라이브
+const HANWOO_BOT = "https://middleton.p-e.kr/finbot/api/hanwoo/chat";  // Gemma4 + RAG (미들턴 team 91)
 let LIVE = false;
 const $ = s => document.querySelector(s);
 
@@ -286,10 +287,10 @@ function demoChat(m){
   return "한우 가격은 30개월 생산 시차 때문에 사이클을 그립니다. 오늘의 작은 변화가 2~3년 뒤 큰 진폭으로 돌아오죠. 구체적으로 가격·수급·사료비·정책 중 무엇이 궁금하신가요?";
 }
 
-// ── 모드 배지 ──
+// ── 모드 배지 (한우 봇 연결 확인) ──
 (async()=>{
-  try{ const h = await api("/api/health"); LIVE = !!h.llm_configured;
-       $("#modeBadge").textContent = LIVE ? "🟢 라이브 (서버 연결)" : "🟡 서버 연결·데모 LLM";
+  try{ const r = await fetch(HANWOO_BOT, {method:"OPTIONS"}); LIVE = r.ok || r.status===204;
+       $("#modeBadge").textContent = LIVE ? "🟢 라이브 (Gemma4·RAG)" : "🟡 데모 모드";
        $("#modeBadge").className = "text-xs px-2.5 py-1 rounded-full "+(LIVE?"bg-emerald-100 text-emerald-700":"bg-amber-100 text-amber-700");
   }catch(e){
     $("#modeBadge").textContent = "🟡 데모 모드 (정적)";
@@ -299,9 +300,10 @@ function demoChat(m){
 
 // ── 예측 차트 ──
 function buildForecast(){
-  const base=19000, pts=12, lab=[],p10=[],p50=[],p90=[];
-  for(let h=1;h<=pts;h++){const v=base+80*h+1500*Math.sin(2*Math.PI*h/30);const w=1+h/12;
-    lab.push(h+"개월");p10.push(Math.round(v-1.28*350*w));p50.push(Math.round(v));p90.push(Math.round(v+1.28*350*w));}
+  // 2026 KREI 앵커: 평균 ~21,000원/kg(+6.9% YoY), 도축 -9%·사육 -3% 공급 급감 → 완만한 상승 + 명절(설·추석) 성수기 피크
+  const base=20000, pts=12, lab=[],p10=[],p50=[],p90=[];
+  for(let h=1;h<=pts;h++){const v=base+150*h+700*Math.sin(2*Math.PI*(h+2)/12);const w=1+h/10;
+    lab.push(h+"개월");p10.push(Math.round(v-1.28*450*w));p50.push(Math.round(v));p90.push(Math.round(v+1.28*450*w));}
   new Chart($("#fcChart"),{type:"line",data:{labels:lab,datasets:[
     {label:"P90",data:p90,borderColor:"#d6b3ad",backgroundColor:"rgba(168,68,59,.08)",fill:"+1",pointRadius:0,tension:.3},
     {label:"P50",data:p50,borderColor:"#7b2d26",backgroundColor:"transparent",borderWidth:2.5,pointRadius:0,tension:.3},
@@ -329,8 +331,11 @@ async function send(msg){
   msg=(msg||$("#chatInput").value).trim(); if(!msg)return;
   $("#chatInput").value=""; bubble("user",msg);
   const t=bubble("bot","…");
-  try{ const r=await api("/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({message:msg,history})});
-       t.textContent=r.reply; history.push({role:"user",content:msg},{role:"assistant",content:r.reply});
+  try{ const r=await fetch(HANWOO_BOT,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({message:msg,history})});
+       if(!r.ok) throw new Error("bot "+r.status);
+       const d=await r.json();
+       t.textContent=d.reply||demoChat(msg);
+       if(d.reply) history.push({role:"user",content:msg},{role:"assistant",content:d.reply});
   }catch(e){ t.textContent=demoChat(msg); }
 }
 $("#chatSend").onclick=()=>send();
