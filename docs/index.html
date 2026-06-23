@@ -36,6 +36,7 @@
     </a>
     <div class="hidden md:flex items-center gap-5 text-sm font-medium text-stone-600">
       <a href="#intro" class="hover:text-stone-900">소개영상</a>
+      <a href="#avatar" class="hover:text-stone-900">라이브 아바타</a>
       <a href="#chat" class="hover:text-stone-900">대화형 AI</a>
       <a href="#news" class="hover:text-stone-900">뉴스포털</a>
       <a href="#jury" class="hover:text-stone-900">LLM Jury</a>
@@ -58,8 +59,9 @@
       자동기사 품질을 보장하는 <b>LLM Jury</b>까지 한 곳에서.
     </p>
     <div class="mt-8 flex flex-wrap gap-3">
-      <a href="#chat" class="bg-white text-stone-900 font-bold px-5 py-3 rounded-xl hover:bg-amber-100">AI에게 물어보기</a>
-      <a href="#news" class="bg-white/15 ring-1 ring-white/40 font-bold px-5 py-3 rounded-xl hover:bg-white/25">뉴스 보기</a>
+      <a href="#avatar" class="bg-white text-stone-900 font-bold px-5 py-3 rounded-xl hover:bg-amber-100">🗣️ 라이브 아바타와 대화</a>
+      <a href="#intro" class="bg-white/15 ring-1 ring-white/40 font-bold px-5 py-3 rounded-xl hover:bg-white/25">소개영상 보기</a>
+      <a href="#chat" class="bg-white/15 ring-1 ring-white/40 font-bold px-5 py-3 rounded-xl hover:bg-white/25">AI에게 물어보기</a>
       <a href="#api" class="bg-white/15 ring-1 ring-white/40 font-bold px-5 py-3 rounded-xl hover:bg-white/25">API 문서</a>
     </div>
     <div class="mt-8 grid grid-cols-2 md:grid-cols-4 gap-3 max-w-3xl">
@@ -76,17 +78,29 @@
 <!-- 소개 영상 -->
 <section id="intro" class="py-14">
   <h2 class="text-2xl font-extrabold mb-1">📺 시스템 소개 영상</h2>
-  <p class="text-stone-500 mb-6">포털의 핵심 기능과 한우 시장 AI 예측의 원리를 한눈에.</p>
+  <p class="text-stone-500 mb-6">AI 아바타가 「AI·DX 기반 한우 수요예측 시스템」을 직접 소개합니다.</p>
   <div class="rounded-2xl overflow-hidden ring-1 ring-stone-200 bg-black aspect-video flex items-center justify-center relative">
-    <video id="introVideo" class="w-full h-full object-cover" controls poster="assets/og-image.png">
+    <video id="introVideo" class="w-full h-full object-contain bg-black" controls playsinline poster="assets/og-image.png">
       <source src="assets/intro.mp4" type="video/mp4" />
     </video>
     <div id="videoFallback" class="absolute inset-0 grad text-white flex flex-col items-center justify-center gap-3 text-center px-6">
       <div class="text-5xl">🎬</div>
-      <p class="font-bold text-lg">소개 영상 자리</p>
-      <p class="text-white/80 text-sm max-w-md">실제 운영 시 <code>assets/intro.mp4</code> 또는 유튜브 임베드로 교체됩니다.<br/>(영상기사 생성 파이프라인으로 자동 제작 가능)</p>
+      <p class="font-bold text-lg">소개 영상</p>
+      <p class="text-white/80 text-sm max-w-md">영상을 불러오는 중입니다…</p>
     </div>
   </div>
+</section>
+
+<!-- 라이브 AI 아바타 -->
+<section id="avatar" class="py-14">
+  <h2 class="text-2xl font-extrabold mb-1">🗣️ 라이브 AI 아바타 상담</h2>
+  <p class="text-stone-500 mb-6">화면 속 AI 아바타와 <b>실시간 음성·텍스트로 대화</b>하세요. 한우 시장 예측·LLM 진단·정책 시뮬레이션 등 시스템에 대해 무엇이든 물어보실 수 있습니다. <span class="text-stone-400">(마이크 권한 허용 필요)</span></p>
+  <div class="rounded-2xl overflow-hidden ring-1 ring-stone-200 bg-stone-900 relative" style="aspect-ratio:16/9">
+    <iframe id="avatarFrame" src="https://embed.liveavatar.com/v1/79a02dca-e6e0-4031-bd1a-ba1a9a807f31?orientation=horizontal"
+            allow="microphone; camera; autoplay" title="한우 AI 라이브 아바타"
+            class="w-full h-full" style="border:0"></iframe>
+  </div>
+  <p class="mt-2 text-xs text-stone-400">※ 라이브 아바타는 LiveAvatar 기반 실시간 대화형 디지털휴먼입니다. 세션은 사용량에 따라 과금될 수 있습니다.</p>
 </section>
 
 <!-- 대화형 AI -->
@@ -257,6 +271,11 @@ function buildForecast(){
 }
 buildForecast();
 
+// 소개영상 로드되면 오버레이 숨김
+(function(){const v=document.getElementById('introVideo'),f=document.getElementById('videoFallback');
+  if(v&&f){v.addEventListener('loadeddata',()=>f.style.display='none');
+           v.addEventListener('error',()=>{f.querySelector('p:last-child').textContent='영상을 준비 중입니다.';});}})();
+
 // ── 채팅 ──
 const log=$("#chatLog"); let history=[];
 function bubble(role,text){
@@ -373,6 +392,7 @@ const APIS=[
   ["POST","/api/article/kidify","초등학생용 쉬운 이야기 기사"],
   ["POST","/api/article/video","음성+텍스트+그림 → 영상기사 스크립트"],
   ["POST","/api/jury","LLM Jury 자동기사 품질심사"],
+  ["GET","/api/avatar/embed","라이브 AI 아바타 임베드 URL 발급"],
   ["GET","/api/forecast","시장 예측(P10·P50·P90)"],
   ["GET","/api/health","상태 점검"],
 ];

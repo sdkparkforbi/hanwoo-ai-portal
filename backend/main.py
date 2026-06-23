@@ -326,6 +326,40 @@ def jury(req: JuryReq):
 
 
 # =====================================================
+# 라이브 AI 아바타 (LiveAvatar) — 임베드 URL 발급 (키 서버측)
+# =====================================================
+LIVE_KEY = load_key("LIVEAVATAR_API_KEY", "LIVEAVATAR_API_KEY.txt")
+LIVE_AVATAR = os.environ.get("LIVEAVATAR_AVATAR_ID", "")
+LIVE_CONTEXT = os.environ.get("LIVEAVATAR_CONTEXT_ID", "")
+LIVE_VOICE = os.environ.get("LIVEAVATAR_VOICE_ID", "")
+_UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/126.0 Safari/537.36"
+
+
+@app.get("/api/avatar/embed")
+def avatar_embed():
+    """LiveAvatar 임베드 URL을 즉석 발급(짧은 수명). 프론트가 iframe으로 표시.
+    환경변수: LIVEAVATAR_API_KEY / _AVATAR_ID / _CONTEXT_ID / _VOICE_ID"""
+    import urllib.request
+    if not (LIVE_KEY and LIVE_AVATAR and LIVE_CONTEXT):
+        raise HTTPException(503, "LiveAvatar 미설정 (키/아바타/컨텍스트 환경변수 필요)")
+    body = {"avatar_id": LIVE_AVATAR, "context_id": LIVE_CONTEXT,
+            "default_language": "ko", "is_sandbox": False, "orientation": "horizontal"}
+    if LIVE_VOICE:
+        body["voice_id"] = LIVE_VOICE
+    req = urllib.request.Request(
+        "https://api.liveavatar.com/v2/embeddings",
+        data=json.dumps(body).encode(),
+        headers={"X-API-KEY": LIVE_KEY, "Content-Type": "application/json", "User-Agent": _UA},
+        method="POST")
+    try:
+        d = json.loads(urllib.request.urlopen(req, timeout=40).read())
+        return {"url": (d.get("data") or {}).get("url"),
+                "script": (d.get("data") or {}).get("script")}
+    except Exception as e:
+        raise HTTPException(502, f"LiveAvatar 발급 실패: {e}")
+
+
+# =====================================================
 # 정적 프론트엔드 (같은 출처로 서빙 → 혼합콘텐츠 없음)
 # =====================================================
 @app.get("/")
