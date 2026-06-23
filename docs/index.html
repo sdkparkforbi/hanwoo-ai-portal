@@ -28,6 +28,30 @@
 </head>
 <body class="bg-stone-50">
 
+<!-- 모바일 카카오톡 인앱브라우저(카카오뷰어) 회피: WebRTC/마이크 위해 외부 브라우저로 유도 -->
+<script>
+(function(){
+  var ua=(navigator.userAgent||'').toLowerCase();
+  if(ua.indexOf('kakaotalk')===-1) return;                 // 카카오 인앱브라우저에서만 작동(일반 크롬/사파리 무영향)
+  var url=location.href;
+  if(ua.indexOf('android')>-1){ location.href='kakaotalk://web/openExternal?url='+encodeURIComponent(url); return; }
+  function guide(){                                          // iOS 등: 자동전환 불가 → 안내 오버레이
+    var d=document.createElement('div');
+    d.style.cssText='position:fixed;inset:0;z-index:99999;background:#1f2937;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;text-align:center;padding:24px;font-family:sans-serif';
+    d.innerHTML='<div style="font-size:44px">🌐</div>'
+      +'<div style="font-size:18px;font-weight:800">Safari(기본 브라우저)로 열어주세요</div>'
+      +'<div style="font-size:14px;opacity:.85;line-height:1.6">실시간 음성 아바타는 카카오톡 내부 브라우저에서<br>마이크가 차단됩니다.<br><br>오른쪽 아래 <b>공유/메뉴</b> → <b>다른 브라우저로 열기</b></div>'
+      +'<button id="kkCopy" style="margin-top:8px;background:#fff;color:#1f2937;font-weight:800;border:0;border-radius:12px;padding:12px 20px;font-size:15px">주소 복사하기</button>';
+    document.body.appendChild(d);
+    d.querySelector('#kkCopy').onclick=function(){ var b=this;
+      (navigator.clipboard?navigator.clipboard.writeText(url):Promise.reject())
+        .then(function(){b.textContent='✅ 복사됨 — Safari에 붙여넣기';})
+        .catch(function(){b.textContent=url;}); };
+  }
+  if(document.body) guide(); else document.addEventListener('DOMContentLoaded',guide);
+})();
+</script>
+
 <!-- NAV -->
 <nav class="sticky top-0 z-40 bg-white/90 backdrop-blur border-b border-stone-200">
   <div class="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
@@ -99,7 +123,22 @@
     <iframe id="avatarFrame" src="https://embed.liveavatar.com/v1/f74041b9-a39a-4d35-948d-a973b4f83c46?orientation=horizontal"
             allow="microphone; camera; autoplay" title="한우 AI 라이브 아바타"
             class="w-full h-full" style="border:0"></iframe>
+    <!-- 대기중 시간 표시 (연결 대기 경과 타이머) -->
+    <div id="avatarWait" class="absolute top-3 left-3 flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/55 text-white text-xs font-bold backdrop-blur" style="z-index:5">
+      <span class="inline-block w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+      연결 대기 중… <span id="avatarWaitT">00:00</span>
+    </div>
   </div>
+  <script>
+  (function(){
+    var box=document.getElementById('avatarWait'), t=document.getElementById('avatarWaitT'), f=document.getElementById('avatarFrame');
+    if(!box||!t) return;
+    var s=0, iv=setInterval(function(){ s++; t.textContent=String((s/60)|0).padStart(2,'0')+':'+String(s%60).padStart(2,'0'); },1000);
+    function done(){ clearInterval(iv); box.style.transition='opacity .5s'; box.style.opacity='0'; setTimeout(function(){ box.style.display='none'; },600); }
+    if(f) f.addEventListener('load', function(){ setTimeout(done,2000); });   // 위젯 로드 2초 뒤 숨김
+    setTimeout(done, 90000);                                                  // 안전장치: 90초 후 숨김
+  })();
+  </script>
   <p class="mt-2 text-xs text-stone-400">※ 라이브 아바타는 LiveAvatar 기반 실시간 대화형 디지털휴먼입니다. 세션은 사용량에 따라 과금될 수 있습니다.</p>
 </section>
 
