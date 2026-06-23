@@ -1,0 +1,19 @@
+# ── 비밀값: API 키/비밀번호는 절대 커밋 금지 ──
+*.txt
+!requirements.txt
+*_KEY*.txt
+*API_KEY*.txt
+*PASSWORD*.txt
+.env
+.env.*
+
+# python
+__pycache__/
+*.pyc
+*.db
+.venv/
+venv/
+
+# os
+.DS_Store
+Thumbs.db

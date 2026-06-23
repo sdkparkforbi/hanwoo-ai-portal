@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>한우 시장 AI 포털 — 멀티모달 시장분석·예측 LLM</title>
+<meta name="description" content="트랜스포머 기반 한우 시장 예측과 LLM 진단을 WebChat·API로 제공하는 멀티모달 포털. 기사 해설봇·초딩용 쉬운 기사·영상기사 생성·LLM Jury 품질심사." />
+<!-- 카카오/오픈그래프 썸네일 (직접 경로) -->
+<meta property="og:type" content="website" />
+<meta property="og:title" content="한우 시장 AI 포털 — 시장분석·예측 LLM" />
+<meta property="og:description" content="대화형 AI·뉴스포털·기사 해설봇·초딩용 쉬운 기사·영상기사 생성·LLM Jury 품질심사·API 제공" />
+<meta property="og:image" content="https://sdkparkforbi.github.io/hanwoo-ai-portal/assets/og-image.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta name="twitter:card" content="summary_large_image" />
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+  :root { --hanwoo:#7b2d26; --hanwoo2:#a8443b; --ink:#1f2937; }
+  html{scroll-behavior:smooth}
+  body{font-family:'Pretendard','Apple SD Gothic Neo','Malgun Gothic',sans-serif;color:var(--ink)}
+  .grad{background:linear-gradient(135deg,#7b2d26 0%,#a8443b 55%,#c9683a 100%)}
+  .card{transition:transform .15s ease, box-shadow .15s ease}
+  .card:hover{transform:translateY(-3px);box-shadow:0 12px 28px rgba(0,0,0,.12)}
+  .chat-bubble{max-width:85%;white-space:pre-wrap;line-height:1.55}
+  ::-webkit-scrollbar{width:9px;height:9px}::-webkit-scrollbar-thumb{background:#cbb;border-radius:6px}
+</style>
+</head>
+<body class="bg-stone-50">
+
+<!-- NAV -->
+<nav class="sticky top-0 z-40 bg-white/90 backdrop-blur border-b border-stone-200">
+  <div class="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
+    <a href="#top" class="flex items-center gap-2 font-extrabold text-lg" style="color:var(--hanwoo)">
+      🐄 한우 시장 AI 포털
+    </a>
+    <div class="hidden md:flex items-center gap-5 text-sm font-medium text-stone-600">
+      <a href="#intro" class="hover:text-stone-900">소개영상</a>
+      <a href="#chat" class="hover:text-stone-900">대화형 AI</a>
+      <a href="#news" class="hover:text-stone-900">뉴스포털</a>
+      <a href="#jury" class="hover:text-stone-900">LLM Jury</a>
+      <a href="#api" class="hover:text-stone-900">API</a>
+    </div>
+    <span id="modeBadge" class="text-xs px-2.5 py-1 rounded-full bg-stone-200 text-stone-600">연결 확인 중…</span>
+  </div>
+</nav>
+
+<!-- HERO -->
+<header id="top" class="grad text-white">
+  <div class="max-w-6xl mx-auto px-4 py-16 md:py-24">
+    <p class="text-amber-200 font-semibold tracking-wide mb-3">MULTIMODAL MARKET-ANALYSIS LLM</p>
+    <h1 class="text-3xl md:text-5xl font-extrabold leading-tight">
+      한우 시장을 읽고, 예측하고,<br/>설명하는 <span class="text-amber-200">AI 포털</span>
+    </h1>
+    <p class="mt-5 text-white/90 max-w-2xl md:text-lg">
+      트랜스포머 기반 시장 예측과 LLM 진단을 <b>WebChat</b>과 <b>API</b>로 제공합니다.
+      뉴스 포털, 기사 해설봇, 초등학생용 쉬운 기사, 음성·텍스트·그림 기반 영상기사 생성,
+      자동기사 품질을 보장하는 <b>LLM Jury</b>까지 한 곳에서.
+    </p>
+    <div class="mt-8 flex flex-wrap gap-3">
+      <a href="#chat" class="bg-white text-stone-900 font-bold px-5 py-3 rounded-xl hover:bg-amber-100">AI에게 물어보기</a>
+      <a href="#news" class="bg-white/15 ring-1 ring-white/40 font-bold px-5 py-3 rounded-xl hover:bg-white/25">뉴스 보기</a>
+      <a href="#api" class="bg-white/15 ring-1 ring-white/40 font-bold px-5 py-3 rounded-xl hover:bg-white/25">API 문서</a>
+    </div>
+    <div class="mt-8 grid grid-cols-2 md:grid-cols-4 gap-3 max-w-3xl">
+      <div class="bg-white/10 rounded-xl p-3"><div class="text-2xl font-extrabold text-amber-200">30개월</div><div class="text-xs text-white/80">생산 시차 반영</div></div>
+      <div class="bg-white/10 rounded-xl p-3"><div class="text-2xl font-extrabold text-amber-200">P10~P90</div><div class="text-xs text-white/80">분위수 예측</div></div>
+      <div class="bg-white/10 rounded-xl p-3"><div class="text-2xl font-extrabold text-amber-200">멀티모달</div><div class="text-xs text-white/80">음성·텍스트·그림</div></div>
+      <div class="bg-white/10 rounded-xl p-3"><div class="text-2xl font-extrabold text-amber-200">LLM Jury</div><div class="text-xs text-white/80">자동기사 품질보장</div></div>
+    </div>
+  </div>
+</header>
+
+<main class="max-w-6xl mx-auto px-4">
+
+<!-- 소개 영상 -->
+<section id="intro" class="py-14">
+  <h2 class="text-2xl font-extrabold mb-1">📺 시스템 소개 영상</h2>
+  <p class="text-stone-500 mb-6">포털의 핵심 기능과 한우 시장 AI 예측의 원리를 한눈에.</p>
+  <div class="rounded-2xl overflow-hidden ring-1 ring-stone-200 bg-black aspect-video flex items-center justify-center relative">
+    <video id="introVideo" class="w-full h-full object-cover" controls poster="assets/og-image.png">
+      <source src="assets/intro.mp4" type="video/mp4" />
+    </video>
+    <div id="videoFallback" class="absolute inset-0 grad text-white flex flex-col items-center justify-center gap-3 text-center px-6">
+      <div class="text-5xl">🎬</div>
+      <p class="font-bold text-lg">소개 영상 자리</p>
+      <p class="text-white/80 text-sm max-w-md">실제 운영 시 <code>assets/intro.mp4</code> 또는 유튜브 임베드로 교체됩니다.<br/>(영상기사 생성 파이프라인으로 자동 제작 가능)</p>
+    </div>
+  </div>
+</section>
+
+<!-- 대화형 AI -->
+<section id="chat" class="py-14">
+  <h2 class="text-2xl font-extrabold mb-1">💬 대화형 시장분석 AI</h2>
+  <p class="text-stone-500 mb-6">가격·수급·사료비·정책·전염병 등 한우 시장을 물어보세요. 예측 차트도 함께 제공합니다.</p>
+  <div class="grid md:grid-cols-5 gap-5">
+    <div class="md:col-span-3 bg-white rounded-2xl ring-1 ring-stone-200 flex flex-col h-[460px]">
+      <div id="chatLog" class="flex-1 overflow-y-auto p-4 space-y-3"></div>
+      <div class="p-3 border-t border-stone-200 flex gap-2">
+        <input id="chatInput" class="flex-1 border border-stone-300 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-amber-400"
+               placeholder="예: 송아지가격이 오르면 도매가는 어떻게 될까요?" />
+        <button id="chatSend" class="grad text-white font-bold px-4 rounded-xl">전송</button>
+      </div>
+    </div>
+    <div class="md:col-span-2 bg-white rounded-2xl ring-1 ring-stone-200 p-4">
+      <div class="flex items-center justify-between mb-2">
+        <h3 class="font-bold">도매가격 예측 (P10·P50·P90)</h3>
+        <span class="text-xs text-stone-400">mock 트랜스포머</span>
+      </div>
+      <canvas id="fcChart" height="220"></canvas>
+      <div class="mt-3 flex flex-wrap gap-2 text-xs">
+        <button class="quick px-2.5 py-1 rounded-full bg-stone-100 hover:bg-amber-100">최근 도매가 동향은?</button>
+        <button class="quick px-2.5 py-1 rounded-full bg-stone-100 hover:bg-amber-100">암소 도태하면 어떻게 되나요?</button>
+        <button class="quick px-2.5 py-1 rounded-full bg-stone-100 hover:bg-amber-100">사료비가 가격에 주는 영향은?</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 뉴스 포털 -->
+<section id="news" class="py-14">
+  <div class="flex items-end justify-between mb-6">
+    <div>
+      <h2 class="text-2xl font-extrabold mb-1">📰 한우 시장 뉴스 포털</h2>
+      <p class="text-stone-500">기사마다 <b>해설봇</b>, <b>초등학생용 쉬운 기사</b>, <b>영상기사 생성</b>을 제공합니다.</p>
+    </div>
+  </div>
+  <div id="newsGrid" class="grid md:grid-cols-2 gap-5"></div>
+</section>
+
+<!-- LLM Jury -->
+<section id="jury" class="py-14">
+  <h2 class="text-2xl font-extrabold mb-1">⚖️ LLM Jury — 자동기사 품질 보장</h2>
+  <p class="text-stone-500 mb-6">무분별한 자동 기사 생성을 막기 위해, 여러 심사 기준으로 채점해 게재 가부를 판정합니다.</p>
+  <div class="grid md:grid-cols-2 gap-5">
+    <div class="bg-white rounded-2xl ring-1 ring-stone-200 p-4">
+      <input id="juryTitle" class="w-full border border-stone-300 rounded-xl px-3 py-2 mb-2" placeholder="기사 제목" value="송아지값 급등, 한우 사이클 반등 신호" />
+      <textarea id="juryText" class="w-full border border-stone-300 rounded-xl px-3 py-2 h-40" placeholder="심사할 기사 본문을 붙여넣으세요">송아지 경매가가 1년 새 11~21% 급등했다. 전문가들은 30개월 생산 시차를 고려할 때 향후 도매가 상승의 선행지표로 본다.</textarea>
+      <button id="juryBtn" class="mt-3 grad text-white font-bold px-4 py-2 rounded-xl w-full">품질 심사 실행</button>
+    </div>
+    <div id="juryResult" class="bg-white rounded-2xl ring-1 ring-stone-200 p-4 flex items-center justify-center text-stone-400">
+      심사 결과가 여기에 표시됩니다.
+    </div>
+  </div>
+</section>
+
+<!-- API -->
+<section id="api" class="py-14">
+  <h2 class="text-2xl font-extrabold mb-1">🔌 API</h2>
+  <p class="text-stone-500 mb-6">모든 기능은 REST API 로도 제공됩니다. (Swagger: <code>/docs</code>)</p>
+  <div class="overflow-x-auto bg-white rounded-2xl ring-1 ring-stone-200">
+    <table class="w-full text-sm">
+      <thead class="bg-stone-100 text-stone-600 text-left">
+        <tr><th class="p-3">메서드</th><th class="p-3">엔드포인트</th><th class="p-3">설명</th></tr>
+      </thead>
+      <tbody id="apiRows" class="divide-y divide-stone-100"></tbody>
+    </table>
+  </div>
+  <div class="mt-4 bg-stone-900 text-stone-100 rounded-2xl p-4 text-sm overflow-x-auto">
+<pre>curl -X POST http://106.247.236.2:8000/api/chat \
+  -H "Content-Type: application/json" \
+  -d '{"message":"송아지값이 오르면 도매가는?"}'</pre>
+  </div>
+</section>
+
+</main>
+
+<footer class="grad text-white/90 mt-10">
+  <div class="max-w-6xl mx-auto px-4 py-8 text-sm">
+    <p class="font-bold text-white">한우 시장 AI 포털 (프로토타입)</p>
+    <p class="mt-1 text-white/70">한우시장 트랜스포머·LLM 방법론 제안서 구현 Mock-Up · 멀티모달 WebChat + API</p>
+    <p class="mt-1 text-white/60">※ 데모 데이터/예측은 합성이며, 실서비스는 서버 백엔드(LLM·예측모델)와 연동됩니다.</p>
+  </div>
+</footer>
+
+<!-- 기사 모달 -->
+<div id="modal" class="fixed inset-0 z-50 hidden bg-black/50 p-4 overflow-y-auto">
+  <div class="max-w-2xl mx-auto bg-white rounded-2xl my-6">
+    <div class="p-5 border-b border-stone-200 flex items-start justify-between gap-4">
+      <div>
+        <span id="mCat" class="text-xs font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800"></span>
+        <h3 id="mTitle" class="text-xl font-extrabold mt-2"></h3>
+        <p id="mDate" class="text-xs text-stone-400 mt-1"></p>
+      </div>
+      <button onclick="closeModal()" class="text-stone-400 hover:text-stone-700 text-2xl leading-none">&times;</button>
+    </div>
+    <div class="p-5">
+      <p id="mBody" class="text-stone-700 leading-relaxed"></p>
+      <div class="mt-4 flex flex-wrap gap-2">
+        <button id="bExplain" class="bg-stone-800 text-white text-sm font-bold px-3 py-2 rounded-lg">🤖 해설봇</button>
+        <button id="bKid" class="bg-emerald-600 text-white text-sm font-bold px-3 py-2 rounded-lg">🧒 초등학생용 쉬운 기사</button>
+        <button id="bVideo" class="bg-indigo-600 text-white text-sm font-bold px-3 py-2 rounded-lg">🎬 영상기사 생성</button>
+      </div>
+      <div id="mOut" class="mt-4 space-y-3"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── 설정: 같은 출처(/api)를 우선 호출 → 실패 시 데모 폴백 ──
+const API = "";                  // 상대경로: FastAPI가 서빙하면 라이브
+let LIVE = false;
+const $ = s => document.querySelector(s);
+
+async function api(path, opts){
+  const r = await fetch(API + path, opts);
+  if(!r.ok) throw new Error("api "+r.status);
+  return r.json();
+}
+
+// 데모 데이터(백엔드 NEWS와 동기화)
+const DEMO_NEWS = [
+  {id:"n1",category:"가격동향",date:"2026-06-10",difficulty:"중",title:"송아지 경매가 1년 새 11~21% 급등… 한우 사이클 반등 신호",
+   summary:"암소 사육 감소가 누적되며 송아지 생산이 줄어 경매가가 급등. 30개월 시차상 도매가 상승의 선행지표.",
+   body:"최근 송아지 경매가격이 전년 대비 11~21% 급등했다. 2022~2023년 사육마릿수가 역대 최대를 기록하며 도매가격이 약 11% 하락했으나, 이후 누적된 암소 감축이 송아지 출생 감소로 이어졌다. 한우는 입식부터 출하까지 약 30개월이 걸려 가격 신호가 공급에 반영되기까지 시차가 크다."},
+  {id:"n2",category:"사료·원가",date:"2026-05-28",difficulty:"중",title:"사료가격지수 고공행진… 곡물가·환율 동반 상승",
+   summary:"국제 곡물가와 환율이 함께 오르며 사료가격지수가 높은 수준 유지, 농가 수익성 압박.",
+   body:"사료가격지수가 2020년 100 기준 대비 높은 수준을 이어가고 있다. 국제 곡물가 상승과 원/달러 환율 상승이 겹치며 배합사료 단가가 올랐다. 사료비는 한우 생산비의 큰 비중을 차지한다."},
+  {id:"n3",category:"정책",date:"2026-05-12",difficulty:"상",title:"농식품부, 한우 수급조절 — 저능력 암소 도태 지원",
+   summary:"단기적으로 도축 증가로 가격이 눌리나, 12~24개월 뒤 공급 감소로 반등 요인.",
+   body:"정부가 한우 수급조절을 위해 저능력 암소 도태 지원 정책을 발표했다. 도태는 단기적으로 도축마릿수를 늘려 가격을 일시적으로 낮추지만, 12~24개월 후에는 송아지 생산 감소로 가격 반등 요인으로 작용한다."},
+  {id:"n4",category:"방역",date:"2026-04-30",difficulty:"상",title:"럼피스킨 산발 발생… 도축·이동 일시 제한",
+   summary:"가축전염병으로 단기 수급 교란. 비정형 충격은 전통 모형으로 포착이 어렵다.",
+   body:"럼피스킨이 산발적으로 발생하며 일부 지역에서 도축·이동이 일시 제한됐다. 이러한 가축전염병은 예고 없이 발생해 단기 수급을 교란하고, 트랜스포머 모형은 이벤트 임베딩으로 이런 충격을 학습에 반영한다."},
+];
+const NEWS_MAP = Object.fromEntries(DEMO_NEWS.map(n=>[n.id,n]));
+
+function demoChat(m){
+  m=m||"";
+  if(/도태|암소/.test(m)) return "저능력 암소 도태는 단기적으로 도축을 늘려 가격을 일시 하락시키지만, 12~24개월 뒤에는 송아지 생산 감소로 출하가 줄어 가격이 반등하는 경향이 있습니다.";
+  if(/사료/.test(m)) return "사료비는 한우 생산비의 큰 비중을 차지합니다. 곡물가·환율 상승으로 사료가격지수가 오르면 농가 수익성이 악화되고, 사육 의향 위축을 통해 중기 공급에 영향을 줄 수 있습니다.";
+  if(/도매|가격|동향/.test(m)) return "최근 한우 도매가격은 누적된 암소 감축의 영향으로 반등 흐름을 보이고 있습니다. 송아지가격 급등이 선행지표로, 30개월 시차를 고려하면 향후 상승 압력이 이어질 수 있습니다.";
+  return "한우 가격은 30개월 생산 시차 때문에 사이클을 그립니다. 오늘의 작은 변화가 2~3년 뒤 큰 진폭으로 돌아오죠. 구체적으로 가격·수급·사료비·정책 중 무엇이 궁금하신가요?";
+}
+
+// ── 모드 배지 ──
+(async()=>{
+  try{ const h = await api("/api/health"); LIVE = !!h.llm_configured;
+       $("#modeBadge").textContent = LIVE ? "🟢 라이브 (서버 연결)" : "🟡 서버 연결·데모 LLM";
+       $("#modeBadge").className = "text-xs px-2.5 py-1 rounded-full "+(LIVE?"bg-emerald-100 text-emerald-700":"bg-amber-100 text-amber-700");
+  }catch(e){
+    $("#modeBadge").textContent = "🟡 데모 모드 (정적)";
+    $("#modeBadge").className = "text-xs px-2.5 py-1 rounded-full bg-amber-100 text-amber-700";
+  }
+})();
+
+// ── 예측 차트 ──
+function buildForecast(){
+  const base=19000, pts=12, lab=[],p10=[],p50=[],p90=[];
+  for(let h=1;h<=pts;h++){const v=base+80*h+1500*Math.sin(2*Math.PI*h/30);const w=1+h/12;
+    lab.push(h+"개월");p10.push(Math.round(v-1.28*350*w));p50.push(Math.round(v));p90.push(Math.round(v+1.28*350*w));}
+  new Chart($("#fcChart"),{type:"line",data:{labels:lab,datasets:[
+    {label:"P90",data:p90,borderColor:"#d6b3ad",backgroundColor:"rgba(168,68,59,.08)",fill:"+1",pointRadius:0,tension:.3},
+    {label:"P50",data:p50,borderColor:"#7b2d26",backgroundColor:"transparent",borderWidth:2.5,pointRadius:0,tension:.3},
+    {label:"P10",data:p10,borderColor:"#d6b3ad",backgroundColor:"transparent",fill:false,pointRadius:0,tension:.3},
+  ]},options:{plugins:{legend:{labels:{boxWidth:10,font:{size:10}}}},scales:{y:{ticks:{font:{size:10}}},x:{ticks:{font:{size:9}}}}}});
+}
+buildForecast();
+
+// ── 채팅 ──
+const log=$("#chatLog"); let history=[];
+function bubble(role,text){
+  const wrap=document.createElement("div");
+  wrap.className="flex "+(role==="user"?"justify-end":"justify-start");
+  const b=document.createElement("div");
+  b.className="chat-bubble rounded-2xl px-4 py-2.5 text-sm "+(role==="user"?"bg-stone-800 text-white":"bg-stone-100 text-stone-800");
+  b.textContent=text; wrap.appendChild(b); log.appendChild(wrap); log.scrollTop=log.scrollHeight; return b;
+}
+bubble("bot","안녕하세요! 한우 시장분석 AI입니다. 가격·수급·사료비·정책에 대해 무엇이든 물어보세요. 🐄");
+async function send(msg){
+  msg=(msg||$("#chatInput").value).trim(); if(!msg)return;
+  $("#chatInput").value=""; bubble("user",msg);
+  const t=bubble("bot","…");
+  try{ const r=await api("/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({message:msg,history})});
+       t.textContent=r.reply; history.push({role:"user",content:msg},{role:"assistant",content:r.reply});
+  }catch(e){ t.textContent=demoChat(msg); }
+}
+$("#chatSend").onclick=()=>send();
+$("#chatInput").addEventListener("keydown",e=>{if(e.key==="Enter")send();});
+document.querySelectorAll(".quick").forEach(b=>b.onclick=()=>send(b.textContent));
+
+// ── 뉴스 ──
+async function loadNews(){
+  let items=DEMO_NEWS;
+  try{ const r=await api("/api/news"); if(r.items&&r.items.length) items=r.items; }catch(e){}
+  const g=$("#newsGrid"); g.innerHTML="";
+  const diffColor={상:"bg-red-100 text-red-700",중:"bg-amber-100 text-amber-700",하:"bg-emerald-100 text-emerald-700"};
+  items.forEach(n=>{
+    const c=document.createElement("div");
+    c.className="card bg-white rounded-2xl ring-1 ring-stone-200 p-5 cursor-pointer";
+    c.innerHTML=`<div class="flex items-center gap-2 mb-2">
+        <span class="text-xs font-bold px-2 py-0.5 rounded-full bg-stone-100 text-stone-600">${n.category}</span>
+        <span class="text-xs px-2 py-0.5 rounded-full ${diffColor[n.difficulty]||'bg-stone-100'}">난이도 ${n.difficulty}</span>
+        <span class="text-xs text-stone-400 ml-auto">${n.date}</span></div>
+      <h3 class="font-extrabold text-lg leading-snug">${n.title}</h3>
+      <p class="text-sm text-stone-500 mt-2">${n.summary}</p>
+      <p class="text-xs font-bold mt-3" style="color:var(--hanwoo)">자세히 + AI 해설 →</p>`;
+    c.onclick=()=>openModal(n.id);
+    g.appendChild(c);
+  });
+}
+loadNews();
+
+// ── 모달 ──
+let curId=null;
+async function openModal(id){
+  curId=id; let n=NEWS_MAP[id];
+  try{ const r=await api("/api/news/"+id); if(r&&r.title) n=r; }catch(e){}
+  $("#mCat").textContent=n.category; $("#mTitle").textContent=n.title;
+  $("#mDate").textContent=n.date+" · 난이도 "+n.difficulty; $("#mBody").textContent=n.body;
+  $("#mOut").innerHTML=""; $("#modal").classList.remove("hidden"); document.body.style.overflow="hidden";
+}
+function closeModal(){$("#modal").classList.add("hidden");document.body.style.overflow="";}
+$("#modal").addEventListener("click",e=>{if(e.target.id==="modal")closeModal();});
+
+function outBox(title,color){
+  const d=document.createElement("div");
+  d.className="rounded-xl p-3 text-sm "+color;
+  d.innerHTML=`<div class="font-bold mb-1">${title}</div><div class="opacity-60">생성 중…</div>`;
+  $("#mOut").prepend(d); return d.querySelector("div:last-child");
+}
+async function callArticle(path,key,demo,title,color){
+  const out=outBox(title,color);
+  const n=NEWS_MAP[curId]||{};
+  try{ const r=await api(path,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({article_id:curId,text:n.body})});
+       out.className=""; out.textContent=typeof r[key]==="string"?r[key]:JSON.stringify(r[key],null,2);
+  }catch(e){ out.className=""; out.textContent=demo(n); }
+}
+$("#bExplain").onclick=()=>callArticle("/api/article/explain","explanation",
+  n=>"① 핵심: "+(n.summary||"공급 신호")+"\n② 이유: 한우는 출하까지 30개월이 걸려 가격 반영에 시차가 큽니다.\n③ 전망: 시차를 고려하면 향후 도매가에 영향을 줄 수 있습니다.",
+  "🤖 해설봇","bg-stone-100 text-stone-800");
+$("#bKid").onclick=()=>callArticle("/api/article/kidify","story",
+  ()=> "소를 키우는 건 라면이 아니라 '사골 가마솥'이에요. 아기 소가 어른 소가 되려면 2년 반이 걸리거든요. 그래서 지금 아기 소 값이 비싸졌다는 건, 2~3년 뒤에 소고기가 귀해질 수 있다는 미리 알려주는 신호랍니다!",
+  "🧒 초등학생용 쉬운 기사","bg-emerald-50 text-emerald-900");
+$("#bVideo").onclick=()=>callArticle("/api/article/video","script",
+  ()=> "[컷1] 나레이션: 송아지 값이 크게 뛰었습니다. / 화면: 경매장 / 자막: 송아지값↑\n[컷2] 나레이션: 한우는 출하까지 30개월. / 화면: 달력 그래픽 / 자막: 30개월 시차\n[컷3] 나레이션: 지금의 급등은 2~3년 뒤 신호. / 화면: 상승 차트 / 자막: 선행지표\n\n(파이프라인: LLM 스크립트→TTS 음성→이미지 생성→합성 렌더링)",
+  "🎬 영상기사 스크립트","bg-indigo-50 text-indigo-900");
+
+// ── LLM Jury ──
+$("#juryBtn").onclick=async()=>{
+  const box=$("#juryResult"); box.className="bg-white rounded-2xl ring-1 ring-stone-200 p-4";
+  box.innerHTML="<p class='text-stone-400'>심사 중…</p>";
+  const payload={title:$("#juryTitle").value,text:$("#juryText").value};
+  let j;
+  try{ const r=await api("/api/jury",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)}); j=r.jury; }
+  catch(e){ const crit=["사실정확성","논리성","출처·근거","편향성(낮을수록 좋음)","가독성"];
+            const sc={}; crit.forEach(c=>sc[c]=72+Math.floor(Math.random()*22));
+            const avg=Math.round(Object.values(sc).reduce((a,b)=>a+b,0)/crit.length);
+            j={scores:sc,average:avg,verdict:avg>=80?"PASS":"REVISE",comment:"(데모) 근거가 비교적 충실하나 출처 표기를 보강하면 좋습니다."}; }
+  renderJury(box,j);
+};
+function renderJury(box,j){
+  const vColor={PASS:"bg-emerald-100 text-emerald-700",REVISE:"bg-amber-100 text-amber-700",REJECT:"bg-red-100 text-red-700"};
+  let rows="";
+  for(const [k,v] of Object.entries(j.scores||{})){
+    rows+=`<div class="flex items-center gap-2 text-sm"><span class="w-40 text-stone-600">${k}</span>
+      <div class="flex-1 bg-stone-100 rounded-full h-2.5"><div class="grad h-2.5 rounded-full" style="width:${v}%"></div></div>
+      <span class="w-8 text-right font-bold">${v}</span></div>`;
+  }
+  box.innerHTML=`<div class="flex items-center justify-between mb-3">
+      <div class="text-3xl font-extrabold" style="color:var(--hanwoo)">${j.average??"-"}<span class="text-base text-stone-400">/100</span></div>
+      <span class="text-sm font-bold px-3 py-1 rounded-full ${vColor[j.verdict]||'bg-stone-100'}">${j.verdict||"-"}</span></div>
+    <div class="space-y-2">${rows}</div>
+    <p class="mt-3 text-sm text-stone-500">📝 ${j.comment||""}</p>`;
+}
+
+// ── API 표 ──
+const APIS=[
+  ["GET","/api/news","뉴스 포털 기사 목록"],
+  ["GET","/api/news/{id}","기사 상세"],
+  ["POST","/api/chat","대화형 시장분석 AI"],
+  ["POST","/api/article/explain","기사 해설봇(친절한 설명)"],
+  ["POST","/api/article/kidify","초등학생용 쉬운 이야기 기사"],
+  ["POST","/api/article/video","음성+텍스트+그림 → 영상기사 스크립트"],
+  ["POST","/api/jury","LLM Jury 자동기사 품질심사"],
+  ["GET","/api/forecast","시장 예측(P10·P50·P90)"],
+  ["GET","/api/health","상태 점검"],
+];
+$("#apiRows").innerHTML=APIS.map(([m,p,d])=>{
+  const mc=m==="GET"?"bg-emerald-100 text-emerald-700":"bg-indigo-100 text-indigo-700";
+  return `<tr><td class="p-3"><span class="text-xs font-bold px-2 py-0.5 rounded ${mc}">${m}</span></td>
+    <td class="p-3 font-mono text-stone-700">${p}</td><td class="p-3 text-stone-500">${d}</td></tr>`;
+}).join("");
+</script>
+</body>
+</html>
